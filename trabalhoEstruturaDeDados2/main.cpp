@@ -1600,7 +1600,7 @@ void trabalho3(int argc, char *argv[ ]) {
 
 int main(int argc, char *argv[ ]) {
 
-    argv[1] = "/Users/juliaaraujo/CLionProjects/dados";
+    //argv[1] = "/Users/juliaaraujo/CLionProjects/dados";
 
     int trabalho;
     printf("Digite 1=Trabalho1 / 2=Trabalho2 / 3=Trabalho3: ");
