@@ -804,11 +804,11 @@ void gerarArquivosDat(int argc, char *argv[ ]) {
     std::ofstream outputFileSort(origemSort, std::ifstream::out | std::ifstream::binary);
 
     outputFileSort << to_string(3) << endl;
-    outputFileSort << to_string(10000) << endl;
-    outputFileSort << to_string(50000) << endl;
-    outputFileSort << to_string(100000) << endl;
-    outputFileSort << to_string(500000) << endl;
-    outputFileSort << to_string(800000) << endl;
+    outputFileSort << to_string(10) << endl;
+    outputFileSort << to_string(50) << endl;
+    outputFileSort << to_string(100) << endl;
+    outputFileSort << to_string(500) << endl;
+    outputFileSort << to_string(800) << endl;
 
     outputFileSort.close();
 }
@@ -852,6 +852,8 @@ struct Node
     bool color;
     Node *left, *right, *parent;
 
+//Construtor
+
     Node(string artistName, string artistId, int position)
     {
         this->artistName = artistName;
@@ -862,6 +864,8 @@ struct Node
     }
 };
 
+//Classe para representar a árvore vermelha-preta
+
 class RBTree
 {
 private:
@@ -871,7 +875,7 @@ protected:
     void rotateRight(Node *&, Node *&);
     void fixViolation(Node *&, Node *&);
 public:
-    // Constructor
+    // Construtor
     RBTree() { root = NULL; }
     void insert(string artistName, string artistId, int &position);
     void inorder();
@@ -881,6 +885,8 @@ public:
 Node* RBTree::getRoot() {
     return root;
 }
+
+// Função recursiva para pecorrer em ordem
 
 void inorderHelper(Node *root)
 {
@@ -892,12 +898,14 @@ void inorderHelper(Node *root)
     inorderHelper(root->right);
 }
 
-
+// função para inserir um nó com a chave fornecida
 Node* BSTInsert(Node* root, Node *pt)
 {
+    // se a arvore estiver vazia retornar um novo nó
     if (root == NULL)
         return pt;
 
+    // Caso contrário, volte a descer na árvore
     if (pt->artistName < root->artistName)
     {
         root->left  = BSTInsert(root->left, pt);
@@ -909,6 +917,7 @@ Node* BSTInsert(Node* root, Node *pt)
         root->right->parent = root;
     }
 
+    // retorna o ponteiro do nó
     return root;
 }
 
@@ -972,13 +981,13 @@ void RBTree::fixViolation(Node *&root, Node *&pt)
         parent_pt = pt->parent;
         grand_parent_pt = pt->parent->parent;
 
-
+        //O pai do pt é filho esquerdo do avô do pt
         if (parent_pt == grand_parent_pt->left)
         {
 
             Node *uncle_pt = grand_parent_pt->right;
 
-
+            //O tio de pt também é vermelho apenas recoloração
             if (uncle_pt != NULL && uncle_pt->color ==
                                     RED)
             {
@@ -990,7 +999,7 @@ void RBTree::fixViolation(Node *&root, Node *&pt)
 
             else
             {
-
+                //pt é filho certo de seu pai é necessária rotação para a esquerda
                 if (pt == parent_pt->right)
                 {
                     rotateLeft(root, parent_pt);
@@ -998,20 +1007,19 @@ void RBTree::fixViolation(Node *&root, Node *&pt)
                     parent_pt = pt->parent;
                 }
 
-
+                //pt é filho esquerdo de seu pai rotação à direita necessária
                 rotateRight(root, grand_parent_pt);
                 swap(parent_pt->color,
                      grand_parent_pt->color);
                 pt = parent_pt;
             }
         }
-
-
+        //O pai do pt é a criança certa do avô do pt
         else
         {
             Node *uncle_pt = grand_parent_pt->left;
 
-
+            //O tio de pt também é vermelho apenas recoloração
             if ((uncle_pt != NULL) && (uncle_pt->color ==
                                        RED))
             {
@@ -1022,7 +1030,7 @@ void RBTree::fixViolation(Node *&root, Node *&pt)
             }
             else
             {
-
+                //pt é filho esquerdo de seu pai rotação à direita
                 if (pt == parent_pt->left)
                 {
                     rotateRight(root, parent_pt);
@@ -1030,7 +1038,7 @@ void RBTree::fixViolation(Node *&root, Node *&pt)
                     parent_pt = pt->parent;
                 }
 
-
+                //pt é filho certo de seu pai rotação para a esquerda
                 rotateLeft(root, grand_parent_pt);
                 swap(parent_pt->color,
                      grand_parent_pt->color);
@@ -1042,11 +1050,17 @@ void RBTree::fixViolation(Node *&root, Node *&pt)
     root->color = BLACK;
 }
 
+// Função para inserir um novo nó com dados fornecidos
+
 void RBTree::insert(string artistName, string artistId, int &position)
 {
     Node *pt = new Node(artistName, artistId, position);
 
+// Inserção BST normal
+
     root = BSTInsert(root, pt);
+
+    // corrige as violações da arvore vermelha preta
 
     fixViolation(root, pt);
 }
@@ -1191,77 +1205,95 @@ struct NodeAux
 // A BTree node
 class BTreeNode
 {
-    NodeAux **keys;
-    int t;
-    BTreeNode **C;
-    int n;
-    bool leaf;
+    NodeAux **keys; // array de chaves
+    int t; // numero minimo de chaves
+    BTreeNode **C; // array de filhos ponteiros
+    int n; // numero atual de chaves
+    bool leaf; //retorna verdadeiro para nó folha
+
 public:
+    // Construtor
+
     BTreeNode(int _t, bool _leaf);
 
+    // Uma função de utilidade para inserir uma nova chave na subárvore enraizada com este nó. A suposição é que o nó não deve estar cheio quando esta função é chamada
 
     void insertNonFull(NodeAux *k);
 
+// Uma função de utilidade para dividir o filho y deste nó. i é um índice de y no array filho C []. O filho y deve estar cheio quando esta função é chamada
 
     void splitChild(int i, BTreeNode *y);
 
+    // Uma função para percorrer todos os nós em uma subárvore enraizada com este nó
+
     void traverse();
 
-    BTreeNode *search(string k, int *comparacoes);   // returns NULL if k is not present.
+    // Uma função para pesquisar uma chave na subárvore enraizada com este nó.
+
+    BTreeNode *search(string k, int *comparacoes);   // retorna nulo caso não encontre k.
 
     NodeAux *getNodeAux(string name);
 
-
+// Tornar BTree friend para que possamos acessar membros privados desta classe nas funções BTree
     friend class BTree;
 };
 
 // A BTree
 class BTree
 {
-    BTreeNode *root;
+    BTreeNode *root; //Ponteiro para o nó raiz
     int t;
 public:
+    //Construtor
     BTree(int _t)
     {  root = NULL;  t = _t; }
 
+    //Função para percorrer a árvore
     void traverse()
     {  if (root != NULL) root->traverse(); }
 
+    //Função para procurar uma chave na árvore
     BTreeNode* search(string k, int *comparacoes)
     {  return (root == NULL)? NULL : root->search(k, comparacoes); }
 
+    //A função principal que insere uma nova chave nesta árvore
     void insert(NodeAux *k);
 };
 
+//Construtor
 BTreeNode::BTreeNode(int t1, bool leaf1)
 {
+    // Copia o numero minimo de chaves
     t = t1;
     leaf = leaf1;
 
-
+// Alocar memória para o número máximo de chaves possíveis e ponteiros filhos
     keys = new NodeAux *[2*t-1];
     C = new BTreeNode *[2*t];
-
+// Inicializa o número de chaves como 0
     n = 0;
 }
-
+// Função para percorrer todos os nós em uma subárvore enraizada com este nó
 void BTreeNode::traverse()
 {
 
+    // Existem n chaves e n + 1 filhos, atravessa n chaves e os primeiros n filhos
     int i;
     for (i = 0; i < n; i++)
     {
-
+        // Se não for folha, antes de imprimir a chave [i], atravesse a subárvore com raiz no filho C [i].
         if (leaf == false)
             C[i]->traverse();
     }
-
+    // Imprime a subárvore enraizada com o último filho
     if (leaf == false)
         C[i]->traverse();
 }
-
+// Função para pesquisar a chave k na subárvore enraizada com este nó
 BTreeNode *BTreeNode::search(string k, int *comparacoes)
 {
+
+    // Encontre a primeira chave maior ou igual a k
     int i = 0;
     while (i < n && k > keys[i]->artistName) {
         i++;
@@ -1270,12 +1302,15 @@ BTreeNode *BTreeNode::search(string k, int *comparacoes)
 
     (*comparacoes)++;
 
+    // Se a chave encontrada for igual a k, retorne este nó
     if ((keys[i] != NULL) && (keys[i]->artistName == k))
         return this;
 
+    // Se a chave não for encontrada aqui e este for um nó folha
     if (leaf == true)
         return NULL;
 
+    // Vá para a criança apropriada
     return C[i]->search(k, comparacoes);
 }
 
@@ -1289,62 +1324,79 @@ NodeAux *BTreeNode::getNodeAux(string name) {
     return NULL;
 }
 
+// A função principal que insere uma nova chave nesta B-Tree
 void BTree::insert(NodeAux *k)
 {
+    // Se a árvore estiver vazia
     if (root == NULL)
     {
+        // Alocar memória para raiz
         root = new BTreeNode(t, true);
-        root->keys[0] = k;
-        root->n = 1;
+        root->keys[0] = k; //inserir chave
+        root->n = 1; // Atualizar o número de chaves na raiz
     }
-    else
+    else // Se a árvore não estiver vazia
     {
+        // Se a raiz estiver cheia, a árvore cresce em altura
         if (root->n == 2*t-1)
         {
             BTreeNode *s = new BTreeNode(t, false);
 
+            // Alocar memória para nova raiz
             s->C[0] = root;
 
+            // Divida a raiz antiga e mova 1 chave para a nova raiz
             s->splitChild(0, root);
 
+            // A nova raiz tem dois filhos agora.
             int i = 0;
             if (s->keys[0]->artistName < k->artistName)
                 i++;
             s->C[i]->insertNonFull(k);
 
+            //muda raiz
             root = s;
         }
-        else
+        else // Se a raiz não estiver cheia, chame insertNonFull para a raiz
             root->insertNonFull(k);
     }
 }
 
-
+// Uma função de utilidade para inserir uma nova chave neste nó
 void BTreeNode::insertNonFull(NodeAux *k)
 {
+    // Inicializa o índice como índice do elemento mais à direita
     int i = n-1;
 
+    // Se este for um nó folha
     if (leaf == true)
     {
 
+       // Encontra a localização da nova chave a ser inserida e move todas as chaves maiores para um lugar à frente
         while (i >= 0 && keys[i]->artistName > k->artistName)
         {
             keys[i+1] = keys[i];
             i--;
         }
 
+
+        // Insira a nova chave no local encontrado
         keys[i+1] = k;
         n = n+1;
     }
-    else
+    else // Se este nó não for folha
     {
+        // Encontre o filho que terá a nova chave
         while (i >= 0 && keys[i]->artistName > k->artistName)
             i--;
 
+        // Veja se a criança encontrada está cheia
         if (C[i+1]->n == 2*t-1)
         {
+            // Se o filho estiver cheio, divida-o
             splitChild(i+1, C[i+1]);
 
+            // Após a divisão, a chave do meio de C [i] sobe e C [i] é dividida em duas. Veja qual dos dois terá a nova chave
 
             if (keys[i+1]->artistName < k->artistName)
                 i++;
@@ -1354,35 +1406,42 @@ void BTreeNode::insertNonFull(NodeAux *k)
 }
 
 
+// Uma função de utilidade para dividir o filho y deste nó
 void BTreeNode::splitChild(int i, BTreeNode *y)
 {
 
+    // Crie um novo nó que irá armazenar (t-1) as chaves de y
     BTreeNode *z = new BTreeNode(y->t, y->leaf);
     z->n = t - 1;
 
+    // Copia as últimas (t-1) chaves de y a z
     for (int j = 0; j < t-1; j++)
         z->keys[j] = y->keys[j+t];
 
+    // Copia os últimos t filhos de y para z
     if (y->leaf == false)
     {
         for (int j = 0; j < t; j++)
             z->C[j] = y->C[j+t];
     }
-
+    // Reduzir o número de chaves em y
     y->n = t - 1;
 
 
     for (int j = n; j >= i+1; j--)
         C[j+1] = C[j];
 
+    // vincular o novo filho a esse nó
     C[i+1] = z;
 
 
     for (int j = n-1; j >= i; j--)
         keys[j+1] = keys[j];
 
+    // Copie a chave do meio de y para este nó
     keys[i] = y->keys[t-1];
 
+    // Aumentar a contagem de chaves neste nó
     n = n + 1;
 }
 
@@ -1541,7 +1600,7 @@ void trabalho3(int argc, char *argv[ ]) {
 
 int main(int argc, char *argv[ ]) {
 
-    //argv[1] = "/Users/juliaaraujo/CLionProjects/dados";
+    argv[1] = "/Users/juliaaraujo/CLionProjects/dados";
 
     int trabalho;
     printf("Digite 1=Trabalho1 / 2=Trabalho2 / 3=Trabalho3: ");
